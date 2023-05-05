@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/ouqiang/gocron/internal/models"
 	"github.com/ouqiang/gocron/internal/routers/dashboard"
+	"github.com/ouqiang/gocron/internal/routers/permission"
 	"github.com/ouqiang/gocron/internal/routers/process"
 	"github.com/ouqiang/gocron/internal/routers/project"
 	"io"
@@ -84,6 +85,12 @@ func Register(m *macaron.Macaron) {
 		m.Post("/disable/:id", user.Disable)
 		m.Post("/editMyPassword", user.UpdateMyPassword)
 		m.Post("/editPassword/:id", user.UpdatePassword)
+	})
+
+	// 权限 / 角色
+	m.Group("/permission", func() {
+		m.Get("/roles", permission.Roles)
+		m.Post("/role/store", binding.Bind(permission.RoleForm{}), permission.EditRole)
 	})
 
 	// 定时任务
@@ -268,7 +275,6 @@ func userAuth(ctx *macaron.Context) {
 	jsonResp := utils.JsonResponse{}
 	data := jsonResp.Failure(utils.AuthError, "认证失败")
 	ctx.Write([]byte(data))
-
 }
 
 // URL权限验证
@@ -375,34 +381,34 @@ func apiAuth(ctx *macaron.Context) {
 	}
 	apiKey := strings.TrimSpace(app.Setting.ApiKey)
 	apiSecret := strings.TrimSpace(app.Setting.ApiSecret)
-	json := utils.JsonResponse{}
+	response := utils.JsonResponse{}
 	if apiKey == "" || apiSecret == "" {
-		msg := json.CommonFailure("使用API前, 请先配置密钥")
+		msg := response.CommonFailure("使用API前, 请先配置密钥")
 		ctx.Write([]byte(msg))
 		return
 	}
 	currentTimestamp := time.Now().Unix()
-	time := ctx.QueryInt64("time")
-	if time <= 0 {
-		msg := json.CommonFailure("参数time不能为空")
+	timeValue := ctx.QueryInt64("time")
+	if timeValue <= 0 {
+		msg := response.CommonFailure("参数time不能为空")
 		ctx.Write([]byte(msg))
 		return
 	}
-	if time < (currentTimestamp - 1800) {
-		msg := json.CommonFailure("time无效")
+	if timeValue < (currentTimestamp - 1800) {
+		msg := response.CommonFailure("time无效")
 		ctx.Write([]byte(msg))
 		return
 	}
 	sign := ctx.QueryTrim("sign")
 	if sign == "" {
-		msg := json.CommonFailure("参数sign不能为空")
+		msg := response.CommonFailure("参数sign不能为空")
 		ctx.Write([]byte(msg))
 		return
 	}
-	raw := apiKey + strconv.FormatInt(time, 10) + strings.TrimSpace(ctx.Req.URL.Path) + apiSecret
+	raw := apiKey + strconv.FormatInt(timeValue, 10) + strings.TrimSpace(ctx.Req.URL.Path) + apiSecret
 	realSign := utils.Md5(raw)
 	if sign != realSign {
-		msg := json.CommonFailure("签名验证失败")
+		msg := response.CommonFailure("签名验证失败")
 		ctx.Write([]byte(msg))
 		return
 	}

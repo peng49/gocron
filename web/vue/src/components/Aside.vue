@@ -50,12 +50,21 @@
       </el-icon>
       <span>进程管理</span>
     </el-menu-item>
-    <el-menu-item index="/user/index" v-if="this.$store.getters.user.isAdmin">
-      <el-icon>
-        <UserFilled/>
-      </el-icon>
-      <span>用户管理</span>
-    </el-menu-item>
+    <el-sub-menu index="/permission-manage" v-if="this.$store.getters.user.isAdmin">
+      <template #title>
+        <el-icon>
+          <WarningFilled/>
+        </el-icon>
+        <span>权限管理</span>
+      </template>
+      <el-menu-item index="/user/index">
+        <span>用户管理</span>
+      </el-menu-item>
+      <el-menu-item index="/role/index">
+        <span>角色管理</span>
+      </el-menu-item>
+    </el-sub-menu>
+
     <el-sub-menu index="/system" v-if="this.$store.getters.user.isAdmin">
       <template #title>
         <el-icon>

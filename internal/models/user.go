@@ -30,8 +30,9 @@ type User struct {
 	Source    UserSource `json:"source" xorm:"varchar(16) notnull default 'system'"`
 	Created   time.Time  `json:"created" xorm:"datetime notnull created"`
 	Updated   time.Time  `json:"updated" xorm:"datetime updated"`
-	IsAdmin   int8       `json:"is_admin" xorm:"tinyint notnull default 0"` // 是否是管理员 1:管理员 0:普通用户
-	Status    Status     `json:"status" xorm:"tinyint notnull default 1"`   // 1: 正常 0:禁用
+	IsAdmin   int8       `json:"is_admin" xorm:"tinyint notnull default 0"`     // 是否是管理员 1:管理员 0:普通用户
+	Status    Status     `json:"status" xorm:"tinyint notnull default 1"`       // 1: 正常 0:禁用
+	Roles     string     `json:"roles" xorm:"varchar(500) not null default ''"` //用户角色 多个角色用,隔开
 	BaseModel `json:"-" xorm:"-"`
 }
 

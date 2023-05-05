@@ -78,8 +78,8 @@ const router = createRouter({
             ]
         },
         {
-            path: '/user',
-            name: '用户管理',
+            path: '/permission-manage',
+            name: '权限管理',
             children: [
                 {
                     path: '/user/index',
@@ -113,7 +113,12 @@ const router = createRouter({
                     meta: {
                         noLogin: true
                     }
-                }
+                },
+                {
+                    path: '/role/index',
+                    name: '角色管理',
+                    component: () => import('@/views/role/list'),
+                },
             ]
         },{
             path:'/system',

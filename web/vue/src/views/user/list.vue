@@ -17,7 +17,7 @@
         background
         layout="prev, pager, next, sizes, total"
         :total="userTotal"
-        :page-size="20"
+        :page-size="searchParams.page_size"
         @size-change="changePageSize"
         @current-change="changePage"
         @prev-click="changePage"

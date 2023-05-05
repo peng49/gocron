@@ -22,8 +22,18 @@ func init() {
 	Db = CreateDb()
 }
 
+func TestResetPassword(t *testing.T) {
+	//_ = Db.Sync2(new(User))
+	user := new(User)
+	err := user.Get("admin")
+	t.Log(err, user.Id)
+	i, err := user.UpdatePassword(user.Id, "Admin@123")
+	t.Log(i, err, user.MatchPassword("Admin@123"))
+}
+
 func TestCreateTable(t *testing.T) {
-	err := Db.CreateTables(Project{})
+	err := Db.CreateTables(Role{})
+	//err := Db.Sync2(new(Role))
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
