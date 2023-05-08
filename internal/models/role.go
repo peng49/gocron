@@ -14,7 +14,7 @@ func (role *Role) Create() (int64, error) {
 }
 
 func (role *Role) Update() (int64, error) {
-	return Db.Cols(`name`).Where("id = ?", role.Id).Update(role)
+	return Db.Cols(`name,permissions`).Where("id = ?", role.Id).Update(role)
 }
 
 func (role *Role) Total(params CommonMap) (int64, error) {

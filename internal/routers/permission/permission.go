@@ -35,10 +35,19 @@ func Roles(ctx *macaron.Context) string {
 	})
 }
 
-func EditRole(ctx *macaron.Context, role RoleForm) string {
+func EditRole(ctx *macaron.Context, form RoleForm) string {
+	role := models.Role{}
+	role.Id = form.Id
+	role.Name = form.Name
+	role.Permissions = form.Permissions
+	if form.Id > 0 {
+		role.Update()
+	} else {
+		role.Create()
+	}
 	resp := utils.JsonResponse{}
 	return resp.Success("Success", map[string]interface{}{
-		"data": "0",
+		"data": role,
 	})
 }
 

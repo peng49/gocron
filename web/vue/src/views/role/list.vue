@@ -7,7 +7,7 @@
     </template>
     <el-row type="flex" justify="end">
       <el-col :span="2">
-        <el-button type="primary" @click="dialogVisible = true">新增</el-button>
+        <el-button type="primary" @click="editRole({})">新增</el-button>
       </el-col>
       <el-col :span="2">
         <el-button type="info" @click="refresh">刷新</el-button>
@@ -36,13 +36,15 @@
           prop="name"
           label="名称">
       </el-table-column>
-      <el-table-column
-          prop="permissions"
-          label="权限">
+      <el-table-column prop="permissions" label="权限">
+        <template #default="scope">
+          <el-tag class="ml-2" type="warning" v-for="permission in scope.row.permissions.split(',')"
+                :key="permission">{{ !!map[permission] ? map[permission] : permission }}</el-tag>
+        </template>
       </el-table-column>
       <el-table-column label="操作" width="300">
-        <template #default>
-          <el-button type="primary">编辑授权</el-button>
+        <template #default="scope">
+          <el-button type="primary" @click="editRole(scope.row)">编辑授权</el-button>
           <el-button type="danger">删除</el-button>
         </template>
       </el-table-column>
@@ -74,7 +76,9 @@
     </template>
   </el-dialog>
 </template>
-
+<style scoped>
+.ml-2 {margin-left: 5px;margin-bottom: 5px}
+</style>
 <script>
 import roleService from '../../api/role'
 
@@ -85,6 +89,7 @@ export default {
       loading: false,
       dialogVisible: false,
       allPermissions: [],
+      map:{},
       roles: [],
       role: {
         name: '',
@@ -116,11 +121,22 @@ export default {
         _this.loading = false;
         _this.roles = data.data
         _this.allPermissions = data.permissions
-        _this.userTotal = data.total
+        for (let i in _this.allPermissions) {
+          _this.map[_this.allPermissions[i].key] = _this.allPermissions[i].name
+        }
+        _this.roleTotal = data.total
         if (callback) {
           callback()
         }
       })
+    },
+    editRole(obj) {
+      let role = Object.assign({},obj)
+      if (role.permissions) {
+        role.permissions = role.permissions.split(',')
+      }
+      this.role = role
+      this.dialogVisible = true
     },
     submit(){
       let _this = this
@@ -132,18 +148,10 @@ export default {
         data.permissions = data.permissions.join(',')
         roleService.store(data, function () {
           _this.$message.success('操作成功')
+          _this.dialogVisible = false
           _this.search()
         })
       })
-    },
-    toEdit(item) {
-      let path = ''
-      if (item === null) {
-        path = '/permission/role/create'
-      } else {
-        path = `/permission/role/edit/${item.id}`
-      }
-      this.$router.push(path)
     },
     refresh() {
       this.search(() => {
