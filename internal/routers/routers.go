@@ -90,6 +90,7 @@ func Register(m *macaron.Macaron) {
 	// 权限 / 角色
 	m.Group("/permission", func() {
 		m.Get("/roles", permission.Roles)
+		m.Get("/role/all", permission.AllRole)
 		m.Post("/role/store", binding.Bind(permission.RoleForm{}), permission.EditRole)
 	})
 

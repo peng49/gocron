@@ -29,10 +29,14 @@
         v-loading="loading"
         style="width: 100%">
       <el-table-column
-          prop="id"
+          prop="id" width="100px"
           label="角色Id">
       </el-table-column>
-      <el-table-column
+      <el-table-column width="150px"
+          prop="slug"
+          label="标识">
+      </el-table-column>
+      <el-table-column width="150px"
           prop="name"
           label="名称">
       </el-table-column>
@@ -52,6 +56,9 @@
   </el-card>
   <el-dialog v-model="dialogVisible" title="编辑">
     <el-form :model="role" ref="roleForm" label-width="120px">
+      <el-form-item label="标识">
+        <el-input v-model="role.slug" :disabled="role.id > 0" />
+      </el-form-item>
       <el-form-item label="名称">
         <el-input v-model="role.name" />
       </el-form-item>
@@ -92,6 +99,7 @@ export default {
       map:{},
       roles: [],
       role: {
+        slug: '',
         name: '',
         permissions: []
       },

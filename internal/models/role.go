@@ -4,6 +4,7 @@ import "github.com/go-xorm/xorm"
 
 type Role struct {
 	Id          int    `json:"id" xorm:"pk autoincr notnull "`
+	Slug        string `json:"slug" xorm:"varchar(64) notnull default '' unique"`
 	Name        string `json:"name" xorm:"varchar(32) notnull unique"` // 用户名
 	Permissions string `json:"permissions" xorm:"text null"`
 	BaseModel   `json:"-" xorm:"-"`
@@ -35,6 +36,13 @@ func (role *Role) List(params CommonMap) ([]Role, error) {
 	}
 
 	return roles, nil
+}
+
+func (role *Role) AllList() ([]Role, error) {
+	roles := make([]Role, 0)
+	err := Db.Cols("id,name,slug").Desc("id").Find(&roles)
+
+	return roles, err
 }
 
 // 解析where

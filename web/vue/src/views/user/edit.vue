@@ -23,11 +23,20 @@
             <el-input v-model="form.confirm_password" type="password"></el-input>
           </el-form-item>
         </template>
-        <el-form-item label="角色" prop="is_admin">
-          <el-radio-group v-model="form.is_admin">
-            <el-radio :label="0">普通用户</el-radio>
-            <el-radio :label="1">管理员</el-radio>
-          </el-radio-group>
+        <el-form-item label="是否是管理员" prop="is_admin">
+          <el-switch
+              v-model="form.is_admin"
+              inline-prompt
+              active-text="是"
+              :active-value="1"
+              inactive-text="否"
+              :inactive-value="0"
+          />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="form.roles" multiple clearable style="width:100%">
+            <el-option v-for="(role,i) in roles" :key="i" :value="role.slug" :label="role.name"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
@@ -42,13 +51,15 @@
       </el-form>
   </el-card>
 </template>
-
 <script>
 import userService from '../../api/user'
+import roleService from '../../api/role'
+
 export default {
   name: 'user-edit',
   data: function () {
     return {
+      roles:[],
       form: {
         id: '',
         name: '',
@@ -56,7 +67,8 @@ export default {
         is_admin: 0,
         password: '',
         confirm_password: '',
-        status: 1
+        status: 1,
+        roles:[],
       },
       formRules: {
         name: [
@@ -79,6 +91,11 @@ export default {
     if (!id) {
       return
     }
+    let that = this;
+    roleService.all({}, function (roles) {
+      console.log('roles',roles)
+      that.roles = roles
+    })
     userService.detail(id, (data) => {
       if (!data) {
         this.$message.error('数据不存在')
@@ -89,6 +106,9 @@ export default {
       this.form.email = data.email
       this.form.is_admin = data.is_admin
       this.form.status = data.status
+      this.form.roles = data.roles.split(',').filter(v => {
+        return !!v
+      })
     })
   },
   methods: {
@@ -101,7 +121,9 @@ export default {
       })
     },
     save () {
-      userService.update(this.form, () => {
+      let data = Object.assign({}, this.form)
+      data.roles = data.roles.join(',')
+      userService.update(data, () => {
         this.$router.push('/user/index')
       })
     },

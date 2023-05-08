@@ -25,6 +25,7 @@ type UserForm struct {
 	ConfirmPassword string // 确认密码
 	Email           string `binding:"Required;MaxSize(50)"` // 邮箱
 	IsAdmin         int8   // 是否是管理员 1:管理员 0:普通用户
+	Roles           string // 确认密码
 	Status          models.Status
 }
 
@@ -112,6 +113,7 @@ func Store(ctx *macaron.Context, form UserForm) string {
 	userModel.Email = form.Email
 	userModel.Password = form.Password
 	userModel.IsAdmin = form.IsAdmin
+	userModel.Roles = form.Roles
 	userModel.Status = form.Status
 
 	if form.Id == 0 {
@@ -125,6 +127,7 @@ func Store(ctx *macaron.Context, form UserForm) string {
 			"name":     form.Name,
 			"email":    form.Email,
 			"status":   form.Status,
+			"roles":    form.Roles,
 			"is_admin": form.IsAdmin,
 		})
 		if err != nil {

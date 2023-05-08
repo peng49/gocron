@@ -11,6 +11,7 @@ import (
 
 type RoleForm struct {
 	Id          int
+	Slug        string `binding:"Required"`
 	Name        string `binding:"Required"`
 	Permissions string
 }
@@ -35,9 +36,17 @@ func Roles(ctx *macaron.Context) string {
 	})
 }
 
+func AllRole(ctx *macaron.Context) string {
+	role := new(models.Role)
+	roles, _ := role.AllList()
+	resp := utils.JsonResponse{}
+	return resp.Success("Success", roles)
+}
+
 func EditRole(ctx *macaron.Context, form RoleForm) string {
 	role := models.Role{}
 	role.Id = form.Id
+	role.Slug = form.Slug
 	role.Name = form.Name
 	role.Permissions = form.Permissions
 	if form.Id > 0 {
